@@ -27,6 +27,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
@@ -167,7 +169,10 @@ fun ControlButton(
     color: Color, // 颜色
     label: String = "",
 ) {
+    val haptic = LocalHapticFeedback.current
+
     Box(
+
         modifier = modifier
             .drawBehind {
                 val strokeWidth = 0.4.dp.toPx()
@@ -201,7 +206,10 @@ fun ControlButton(
 
         Column(
             modifier = modifier
-                .clickable(onClick = onClick)
+                .clickable(onClick = {
+                    haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                    onClick()
+                })
                 .fillMaxWidth() // 让 Column 占满宽度
                 .wrapContentSize(Alignment.Center), // 让内容居中
             horizontalAlignment = Alignment.CenterHorizontally // 让子元素水平居中
