@@ -1,6 +1,8 @@
 package com.polariss.rimokon
 
+import android.hardware.ConsumerIrManager
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -37,21 +39,70 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.polariss.rimokon.ui.theme.RimokonTheme
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class MainActivity : ComponentActivity() {
+    private lateinit var irManager: ConsumerIrManager
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        irManager = getSystemService(CONSUMER_IR_SERVICE) as ConsumerIrManager
+
+        if (!irManager.hasIrEmitter()) {
+            Toast.makeText(
+                this,
+                "您的手机不支持红外功能，该软件不可用",
+                Toast.LENGTH_SHORT
+            ).show()
+        }
+
         enableEdgeToEdge()
         setContent {
             RimokonTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                     App(
-                        modifier = Modifier
-                            .padding(innerPadding)
+                        modifier = Modifier.padding(innerPadding),
+                        onButtonClick = { buttonLabel ->
+                            handleButtonClick(buttonLabel)
+                        }
                     )
-
                 }
             }
+        }
+    }
+
+    // Debounce
+    private var lastClickTime = 0L
+    private val debounceTime = 50L
+
+    private fun handleButtonClick(buttonLabel: String) {
+        if (!irManager.hasIrEmitter()) return
+        val currentTime = System.currentTimeMillis()
+        if (currentTime - lastClickTime < debounceTime) {
+            return // 忽略过快的连续点击
+        }
+        lastClickTime = currentTime
+
+        if (!irManager.hasIrEmitter()) return
+
+        when (buttonLabel) {
+            "ON/OFF" -> sendIrSignal(Pattern.POWER.value)
+            "BRIGHTNESS+" -> sendIrSignal(Pattern.UP.value)
+            "NIGHTMODE" -> sendIrSignal(Pattern.NIGHT.value)
+            "BRIGHTNESS-" -> sendIrSignal(Pattern.DOWN.value)
+            "COLD" -> sendIrSignal(Pattern.COLD.value)
+            "WARM" -> sendIrSignal(Pattern.WARM.value)
+            "WARMEST" -> sendIrSignal(Pattern.WARMEST.value)
+        }
+    }
+
+    private fun sendIrSignal(pattern: IntArray) {
+        CoroutineScope(Dispatchers.IO).launch {
+            val carrierFrequency = 38000
+            irManager.transmit(carrierFrequency, pattern)
         }
     }
 }
@@ -65,21 +116,16 @@ val PixelSans = FontFamily(
 )
 
 @Composable
-fun App(modifier: Modifier = Modifier) {
-    Column(
-        modifier = modifier
-            .fillMaxWidth(),
-
-        ) {
+fun App(modifier: Modifier = Modifier, onButtonClick: (String) -> Unit) {
+    Column(modifier = modifier.fillMaxWidth()) {
         Text(
             text = "リモコン",
-            modifier = Modifier
-                .padding(top = 120.dp, start = 20.dp),
+            modifier = Modifier.padding(top = 120.dp, start = 20.dp),
             fontFamily = PixelSans,
             fontSize = 32.sp,
         )
         IconView()
-        ControlArea()
+        ControlArea(modifier = Modifier, onButtonClick = onButtonClick) // 修复参数顺序
     }
 }
 
@@ -102,64 +148,43 @@ fun IconView(modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun ControlArea(modifier: Modifier = Modifier) {
-    // 定义3x3网格的按钮配置 (使用密封类区分空按钮和普通按钮)
+fun ControlArea(modifier: Modifier = Modifier, onButtonClick: (String) -> Unit) {
     val buttonConfigs = listOf(
-        ButtonConfig.Normal(
-            iconRes = R.drawable.power,
-            color = Color(0xFFFF2E5B),
-            label = "ON/OFF"
-        ),
-        ButtonConfig.Normal(iconRes = R.drawable.up, color = Color.Black, label = "BRIGHTNESS +"),
-        ButtonConfig.Normal(
-            iconRes = R.drawable.night_mode,
-            color = Color(0xFF2E31FF),
-            label = "NIGHTMODE"
-        ),
+        ButtonConfig.Normal(R.drawable.power, Color(0xFFFF2E5B), "ON/OFF"),
+        ButtonConfig.Normal(R.drawable.up, Color.Black, "BRIGHTNESS+"),
+        ButtonConfig.Normal(R.drawable.night_mode, Color(0xFF2E31FF), "NIGHTMODE"),
         ButtonConfig.Empty,
-        ButtonConfig.Normal(iconRes = R.drawable.down, color = Color.Black, label = "BRIGHTNESS -"),
+        ButtonConfig.Normal(R.drawable.down, Color.Black, "BRIGHTNESS-"),
         ButtonConfig.Empty,
-        ButtonConfig.Normal(iconRes = R.drawable.cold, color = Color.Black, label = "COLD"),
-        ButtonConfig.Normal(
-            iconRes = R.drawable.cold_warm,
-            color = Color.Black,
-            label = "COLD + WARM"
-        ),
-        ButtonConfig.Normal(iconRes = R.drawable.warm, color = Color.Black, label = "WARM"),
+        ButtonConfig.Normal(R.drawable.cold, Color.Black, "COLD"),
+        ButtonConfig.Normal(R.drawable.warm, Color.Black, "WARM"),
+        ButtonConfig.Normal(R.drawable.warmest, Color.Black, "WARMEST")
     )
 
-    // 网格布局
     LazyVerticalGrid(
         modifier = modifier
             .fillMaxWidth()
             .border(.4.dp, Color(0xFFDADADA)),
-
-        columns = GridCells.Fixed(3),
+        columns = GridCells.Fixed(3)
     ) {
         items(buttonConfigs.size) { index ->
-            when (val config = buttonConfigs[index]) { // 赋值给局部变量 config
+            when (val config = buttonConfigs[index]) {
                 is ButtonConfig.Normal -> {
                     ControlButton(
-                        modifier = Modifier
-                            .aspectRatio(1f),
-                        onClick = { /* 处理按钮点击 */ },
-                        id = config.iconRes, // 传递图标资源
-                        color = config.color,  // 传递颜色
+                        modifier = Modifier.aspectRatio(1f),
+                        onClick = { onButtonClick(config.label) },
+                        id = config.iconRes,
+                        color = config.color,
                         label = config.label
                     )
                 }
 
-                else -> {
-                    EmptyButton(
-                        modifier = Modifier
-                            .aspectRatio(1f)
-                    )
-                }
+                else -> EmptyButton(modifier = Modifier.aspectRatio(1f))
             }
         }
-
     }
 }
+
 
 @Composable
 fun ControlButton(
@@ -207,7 +232,7 @@ fun ControlButton(
         Column(
             modifier = modifier
                 .clickable(onClick = {
-                    haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                    haptic.performHapticFeedback(HapticFeedbackType.LongPress)
                     onClick()
                 })
                 .fillMaxWidth() // 让 Column 占满宽度
@@ -272,7 +297,5 @@ fun EmptyButton(modifier: Modifier = Modifier) {
                     strokeWidth
                 ) // 底部
             }
-    ) {
-
-    }
+    ) {}
 }
