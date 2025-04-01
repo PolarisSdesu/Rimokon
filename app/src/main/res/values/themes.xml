@@ -1,5 +1,25 @@
-<?xml version="1.0" encoding="utf-8"?>
 <resources>
 
+    <!-- 默认主题继承自 Theme.Material.Light.NoActionBar -->
     <style name="Theme.Rimokon" parent="android:Theme.Material.Light.NoActionBar" />
+
+    <!-- Splash Screen主题 -->
+    <style name="Theme.Rimokon.Starting" parent="Theme.SplashScreen">
+        <!-- 启动图标 -->
+        <item name="windowSplashScreenAnimatedIcon">@drawable/ic_launcher_foreground</item>
+
+        <!-- 背景颜色 -->
+        <item name="windowSplashScreenBackground">@color/white</item>
+
+        <!-- 动画时长 -->
+        <item name="windowSplashScreenAnimationDuration">1000</item>
+
+        <!-- 旧版 Android 兼容性 -->
+        <item name="android:windowLayoutInDisplayCutoutMode">shortEdges</item>
+
+        <!-- 确保没有Action Bar -->
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowActionBar">false</item>
+    </style>
+
 </resources>
