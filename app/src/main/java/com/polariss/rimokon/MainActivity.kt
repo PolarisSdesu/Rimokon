@@ -42,7 +42,6 @@ import com.polariss.rimokon.ui.theme.RimokonTheme
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 class MainActivity : ComponentActivity() {
     private lateinit var irManager: ConsumerIrManager
