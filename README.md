@@ -1,5 +1,5 @@
 ## リモコン（Rimokon）
-Rimokon 是一款在闲暇时间为我在 yangkeduo 上买的磁吸式 LED 灯的控制器。
+リモコン（Rimokon）是一款在闲暇时间为我在 yangkeduo 上买的磁吸式 LED 灯的控制器。
 
 它完全使用 Jetpack Compose ＋ Kotlin 开发，并使用 `ConsumerIrManager API` 来发送红外信号。
 
@@ -38,7 +38,7 @@ Rimokon 是一款在闲暇时间为我在 yangkeduo 上买的磁吸式 LED 灯�
 ![cc60aab067ec10b0f46f6a89992e3844](https://github.com/user-attachments/assets/46c7394a-f846-42e1-b27a-290dc2600feb)
 
 
-## PROMTO RAW TO PULSE ARRAY
+## PROMTO RAW to PULSE ARRAY
 我们可以把 `PROMTO RAW` 格式的红外码转换成适用于 `ConsumerIrManager API` 的脉冲数组，我使用下列的 Python 程序来转换：
 
 ```python
