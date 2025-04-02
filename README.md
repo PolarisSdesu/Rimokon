@@ -25,9 +25,18 @@ Rimokon 是一款在闲暇时间为我在 yangkeduo 上买的磁吸式 LED 灯�
 夜间模式（最低亮度＋偏暖色）：E21D -> 71
 
 ## NEC Code to PROMTO RAW
-拿到了标准 NEC 码后，你就可以...
+拿到了标准 NEC 码后，你就可以将它转换为 PROMTO RAW 格式：
 
-# PROMTO RAW TO PULSE ARRAY
+- 首先你需要一个 [IrScrutinizer](https://github.com/bengtmartensson/IrScrutinizer)，感谢他的伟大杰作🙏
+- 安装，打开，没什么好说的
+- 点击顶栏的 `Render` 选项，左边的协议（Protocol）选择 `NEC-f16`
+- 协议右边的 `D` 表示你的地址码、`S` 表示子地址（我们不需要它）、`F` 表示命令码
+- 我的地址码是：0xFF，也就是十进制的 0，将 0xFF 或 0 输入到 `D` 中
+- 忽略 `S` 选项，我们不需要输入它
+- 输入一个命令码，我这里用开／关来做个例子，开／关的命令码是 A25D，对应十进制的 69，所以我们将 A25D 或 69 输入到 `F` 中
+- 点击下方的 Render 按钮，你应该就可以看到文本框输出了 PROMTO RAW 格式的数据！
+
+## PROMTO RAW TO PULSE ARRAY
 我们可以把 `PROMTO RAW` 格式的红外码转换成适用于 `ConsumerIrManager API` 的脉冲数组，我使用下列的 Python 程序来转换：
 
 ```python
