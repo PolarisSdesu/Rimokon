@@ -60,4 +60,4 @@ if __name__ == "__main__":
     print("转换后的 Android 红外码数组:")
     print(pattern)
 ```
-输出的结果就是 Android 设备可用的脉冲数组！
+输出的结果就是 `ConsumerIrManager API` 可用的脉冲数组！
