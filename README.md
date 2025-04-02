@@ -1,5 +1,5 @@
 ## リモコン（Rimokon）
-リモコン（Rimokon）是一款在闲暇时间为我在 yangkeduo 上买的磁吸式 LED 灯的控制器。
+リモコン（Rimokon）是一款在闲暇时间为我在 yangkeduo 上买的磁吸式 LED 灯控制器。
 
 它完全使用 Jetpack Compose ＋ Kotlin 开发，并使用 `ConsumerIrManager API` 来发送红外信号。
 
