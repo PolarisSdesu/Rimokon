@@ -89,9 +89,9 @@ class MainActivity : ComponentActivity() {
 
         when (buttonLabel) {
             "ON/OFF" -> sendIrSignal(Pattern.POWER.value)
-            "BRIGHTNESS+" -> sendIrSignal(Pattern.UP.value)
+            "BRIGHTNESS +" -> sendIrSignal(Pattern.UP.value)
             "NIGHTMODE" -> sendIrSignal(Pattern.NIGHT.value)
-            "BRIGHTNESS-" -> sendIrSignal(Pattern.DOWN.value)
+            "BRIGHTNESS -" -> sendIrSignal(Pattern.DOWN.value)
             "COLD" -> sendIrSignal(Pattern.COLD.value)
             "WARM" -> sendIrSignal(Pattern.WARM.value)
             "WARMEST" -> sendIrSignal(Pattern.WARMEST.value)
@@ -150,10 +150,10 @@ fun IconView(modifier: Modifier = Modifier) {
 fun ControlArea(modifier: Modifier = Modifier, onButtonClick: (String) -> Unit) {
     val buttonConfigs = listOf(
         ButtonConfig.Normal(R.drawable.power, Color(0xFFFF2E5B), "ON/OFF"),
-        ButtonConfig.Normal(R.drawable.up, Color.Black, "BRIGHTNESS+"),
+        ButtonConfig.Normal(R.drawable.up, Color.Black, "BRIGHTNESS +"),
         ButtonConfig.Normal(R.drawable.night_mode, Color(0xFF2E31FF), "NIGHTMODE"),
         ButtonConfig.Empty,
-        ButtonConfig.Normal(R.drawable.down, Color.Black, "BRIGHTNESS-"),
+        ButtonConfig.Normal(R.drawable.down, Color.Black, "BRIGHTNESS -"),
         ButtonConfig.Empty,
         ButtonConfig.Normal(R.drawable.cold, Color.Black, "COLD"),
         ButtonConfig.Normal(R.drawable.warm, Color.Black, "WARM"),
