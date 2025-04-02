@@ -3,7 +3,7 @@ Rimokon 是一款在闲暇时间为我在 yangkeduo 上买的磁吸式 LED 灯�
 
 它完全使用 Jetpack Compose ＋ Kotlin 开发，并使用 `ConsumerIrManager API` 来发送红外信号。
 
-# 按键映射
+## 按键映射
 我的 LED 灯的信号映射表（标准 NEC 码）：
 
 地址码：0xFF -> 0
@@ -35,6 +35,8 @@ Rimokon 是一款在闲暇时间为我在 yangkeduo 上买的磁吸式 LED 灯�
 - 忽略 `S` 选项，我们不需要输入它
 - 输入一个命令码，我这里用开／关来做个例子，开／关的命令码是 A25D，对应十进制的 69，所以我们将 A25D 或 69 输入到 `F` 中
 - 点击下方的 Render 按钮，你应该就可以看到文本框输出了 PROMTO RAW 格式的数据！
+![cc60aab067ec10b0f46f6a89992e3844](https://github.com/user-attachments/assets/46c7394a-f846-42e1-b27a-290dc2600feb)
+
 
 ## PROMTO RAW TO PULSE ARRAY
 我们可以把 `PROMTO RAW` 格式的红外码转换成适用于 `ConsumerIrManager API` 的脉冲数组，我使用下列的 Python 程序来转换：
@@ -58,3 +60,4 @@ if __name__ == "__main__":
     print("转换后的 Android 红外码数组:")
     print(pattern)
 ```
+输出的结果就是 Android 设备可用的脉冲数组！
