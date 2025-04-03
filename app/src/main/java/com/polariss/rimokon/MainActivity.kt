@@ -14,7 +14,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
@@ -119,12 +118,20 @@ fun App(modifier: Modifier = Modifier, onButtonClick: (String) -> Unit) {
     Column(modifier = modifier.fillMaxWidth()) {
         Text(
             text = "リモコン",
-            modifier = Modifier.padding(top = 120.dp, start = 20.dp),
+            modifier = Modifier.padding(top = 80.dp, start = 20.dp),
             fontFamily = PixelSans,
             fontSize = 32.sp,
         )
-        IconView()
-        ControlArea(modifier = Modifier, onButtonClick = onButtonClick) // 修复参数顺序
+        IconView(
+            modifier = Modifier
+                .weight(1f)
+                .fillMaxWidth()
+        )
+        ControlArea(
+            modifier = Modifier
+                .padding(bottom = 60.dp),
+            onButtonClick = onButtonClick
+        ) // 修复参数顺序
     }
 }
 
@@ -132,8 +139,6 @@ fun App(modifier: Modifier = Modifier, onButtonClick: (String) -> Unit) {
 fun IconView(modifier: Modifier = Modifier) {
     Box(
         modifier = modifier
-            .height(260.dp)
-            .fillMaxWidth()
             .background(Color.Transparent),
         contentAlignment = Alignment.Center
     ) {
