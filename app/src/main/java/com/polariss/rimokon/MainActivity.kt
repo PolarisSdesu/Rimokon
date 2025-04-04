@@ -31,6 +31,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
@@ -117,7 +118,7 @@ val PixelSans = FontFamily(
 fun App(modifier: Modifier = Modifier, onButtonClick: (String) -> Unit) {
     Column(modifier = modifier.fillMaxWidth()) {
         Text(
-            text = "リモコン",
+            text = stringResource(R.string.app_name),
             modifier = Modifier.padding(top = 80.dp, start = 20.dp),
             fontFamily = PixelSans,
             fontSize = 32.sp,
