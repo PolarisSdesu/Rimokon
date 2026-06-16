@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">控制器</string>
+    <string name="app_tile_name">开/关</string>
 </resources>

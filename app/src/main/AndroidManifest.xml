@@ -20,13 +20,31 @@
             android:name=".MainActivity"
             android:exported="true"
             android:theme="@style/Theme.Rimokon.Starting"
-            android:screenOrientation="portrait">
+            android:screenOrientation="portrait"
+            tools:ignore="DiscouragedApi">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <service
+            android:name=".RimokonTileService"
+            android:exported="true"
+            android:label="@string/app_tile_name"
+            android:icon="@drawable/ic_tileservice"
+            android:permission="android.permission.BIND_QUICK_SETTINGS_TILE">
+
+            <intent-filter>
+                <action android:name="android.service.quicksettings.action.QS_TILE" />
+            </intent-filter>
+
+            <intent-filter>
+                <action android:name="android.service.quicksettings.action.QS_TILE_PREFERENCES" />
+            </intent-filter>
+
+        </service>
     </application>
 
 </manifest>

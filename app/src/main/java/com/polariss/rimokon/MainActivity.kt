@@ -38,8 +38,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.lifecycleScope
 import com.polariss.rimokon.ui.theme.RimokonTheme
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
@@ -73,7 +73,7 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    // Debounce
+    // 防抖
     private var lastClickTime = 0L
     private val debounceTime = 50L
 
@@ -84,8 +84,6 @@ class MainActivity : ComponentActivity() {
             return // 忽略过快的连续点击
         }
         lastClickTime = currentTime
-
-        if (!irManager.hasIrEmitter()) return
 
         when (buttonLabel) {
             "ON/OFF" -> sendIrSignal(Pattern.POWER.value)
@@ -99,12 +97,13 @@ class MainActivity : ComponentActivity() {
     }
 
     private fun sendIrSignal(pattern: IntArray) {
-        CoroutineScope(Dispatchers.IO).launch {
-            val carrierFrequency = 38000
-            irManager.transmit(carrierFrequency, pattern)
+        lifecycleScope.launch(Dispatchers.IO) {
+            IrHelper.sendIrSignal(irManager, pattern)
         }
     }
 }
+
+// ── 字体 ──
 
 val N57Sans = FontFamily(
     Font(R.font.n57, FontWeight.Normal)
@@ -113,6 +112,8 @@ val N57Sans = FontFamily(
 val PixelSans = FontFamily(
     Font(R.font.pixel_cjk, FontWeight.Normal)
 )
+
+// ── UI 组件 ──
 
 @Composable
 fun App(modifier: Modifier = Modifier, onButtonClick: (String) -> Unit) {
@@ -132,7 +133,7 @@ fun App(modifier: Modifier = Modifier, onButtonClick: (String) -> Unit) {
             modifier = Modifier
                 .padding(bottom = 60.dp),
             onButtonClick = onButtonClick
-        ) // 修复参数顺序
+        )
     }
 }
 
@@ -190,59 +191,29 @@ fun ControlArea(modifier: Modifier = Modifier, onButtonClick: (String) -> Unit) 
     }
 }
 
-
 @Composable
 fun ControlButton(
     modifier: Modifier = Modifier,
     onClick: () -> Unit = {},
-    id: Int, // 图标资源
-    color: Color, // 颜色
+    id: Int,
+    color: Color,
     label: String = "",
 ) {
     val haptic = LocalHapticFeedback.current
 
     Box(
-
         modifier = modifier
-            .drawBehind {
-                val strokeWidth = 0.4.dp.toPx()
-                // 绘制四周的边框
-                drawLine(
-                    Color(0xFFDADADA),
-                    start = Offset(0f, 0f),
-                    end = Offset(size.width, 0f),
-                    strokeWidth
-                ) // 顶部
-                drawLine(
-                    Color(0xFFDADADA),
-                    start = Offset(0f, 0f),
-                    end = Offset(0f, size.height),
-                    strokeWidth
-                ) // 左侧
-                drawLine(
-                    Color(0xFFDADADA),
-                    start = Offset(size.width, 0f),
-                    end = Offset(size.width, size.height),
-                    strokeWidth
-                ) // 右侧
-                drawLine(
-                    Color(0xFFDADADA),
-                    start = Offset(0f, size.height),
-                    end = Offset(size.width, size.height),
-                    strokeWidth
-                ) // 底部
-            }) {
-
-
+            .pixelBorder()
+    ) {
         Column(
-            modifier = modifier
+            modifier = Modifier
                 .clickable(onClick = {
                     haptic.performHapticFeedback(HapticFeedbackType.LongPress)
                     onClick()
                 })
-                .fillMaxWidth() // 让 Column 占满宽度
-                .wrapContentSize(Alignment.Center), // 让内容居中
-            horizontalAlignment = Alignment.CenterHorizontally // 让子元素水平居中
+                .fillMaxWidth()
+                .wrapContentSize(Alignment.Center),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Icon(
                 painter = painterResource(id = id),
@@ -273,34 +244,19 @@ sealed class ButtonConfig {
 fun EmptyButton(modifier: Modifier = Modifier) {
     Box(
         modifier = modifier
-            .aspectRatio(1f)
             .background(Color.Transparent)
-            .drawBehind {
-                val strokeWidth = 0.4.dp.toPx()
-                drawLine(
-                    Color(0xFFDADADA),
-                    start = Offset(0f, 0f),
-                    end = Offset(size.width, 0f),
-                    strokeWidth
-                ) // 顶部
-                drawLine(
-                    Color(0xFFDADADA),
-                    start = Offset(0f, 0f),
-                    end = Offset(0f, size.height),
-                    strokeWidth
-                ) // 左侧
-                drawLine(
-                    Color(0xFFDADADA),
-                    start = Offset(size.width, 0f),
-                    end = Offset(size.width, size.height),
-                    strokeWidth
-                ) // 右侧
-                drawLine(
-                    Color(0xFFDADADA),
-                    start = Offset(0f, size.height),
-                    end = Offset(size.width, size.height),
-                    strokeWidth
-                ) // 底部
-            }
+            .pixelBorder()
     ) {}
+}
+
+// ── 公用 Modifier扩展 ──
+
+/** 像素风格的四边边框（0.4dp 灰色 #DADADA） */
+private fun Modifier.pixelBorder(): Modifier = this.drawBehind {
+    val strokePx = 0.4.dp.toPx()
+    val c = Color(0xFFDADADA)
+    drawLine(c, Offset.Zero, Offset(size.width, 0f), strokePx)                 // 上
+    drawLine(c, Offset.Zero, Offset(0f, size.height), strokePx)                // 左
+    drawLine(c, Offset(size.width, 0f), Offset(size.width, size.height), strokePx)  // 右
+    drawLine(c, Offset(0f, size.height), Offset(size.width, size.height), strokePx) // 下
 }
